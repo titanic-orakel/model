@@ -1,0 +1,83 @@
+---
+title: "Titanic-Orakel: Modellerstellung"
+output: html_notebook
+---
+
+### 1. Pakete ggf. installieren und laden
+
+```{r}
+if (!require("pacman")) install.packages("pacman")
+pacman::p_load(farff, caret, e1071, rpart, rpart.plot)
+```
+
+### 2. Datensatz importieren
+
+```{r}
+titanic <- readARFF("titanic-orakel_data.arff")
+```
+
+### 3. Datenpartition
+
+Datenset in Trainings- und Testdaten aufteilen:
+```{r}
+set.seed(1234)                         # Reproduzierbarkeit gewährleisten
+trainIndex <- createDataPartition(
+  y = titanic$survived,                # vorherzusagende Zielvariable
+  p = .8,                              # 80% der Daten ins Trainingsset
+  list = FALSE                         # Listenausgabe verhindern
+)
+```
+
+Trainingsset erstellen:
+```{r}
+train_data <- titanic[trainIndex,]
+```
+
+Testset erstellen:
+```{r}
+test_data <- titanic[-trainIndex,]
+```
+
+### 4. Support Vector Machines (SVM)
+
+SVM-Modell erstellen:
+```{r}
+set.seed(1234)               # Reproduzierbarkeit gewährleisten
+model_svm <- svm(
+  formula = survived ~ .,    # abhängige Zielvariable
+  data = train_data,         # Trainingsset verwenden
+  probability = TRUE         # Vorhersagen ermöglichen
+  )
+```
+
+Vorhersagen anhand des SVM-Modells treffen:
+```{r}
+pred_svm <- predict(model_svm, test_data[,-1], probability = TRUE)
+```
+
+Confusion Matrix erstellen:
+```{r}
+confusionMatrix(pred_svm, test_data$survived)
+```
+
+SVM-Modell für Shiny-Upload speichern:
+```{r}
+saveRDS(model_svm, "./titanic-orakel_svm.rds")
+```
+
+### 5. Decision Tree (DT)
+
+DT-Modell erstellen:
+```{r}
+set.seed(1234)               # Reproduzierbarkeit gewährleisten
+model_dt <- rpart(
+  formula = survived ~ .,    # abhängige Zielvariable
+  data = train_data,         # Trainingsset verwenden
+  method = "class"           # Klassifikationsbaum erstellen
+  )
+```
+
+DT-Plot erstellen:
+```{r}
+plot_dt <- rpart.plot(model_dt)
+```
