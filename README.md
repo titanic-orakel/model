@@ -1,6 +1,6 @@
 # Titanic-Orakel
 
-Das Titanic-Orakel ist eine algorithmenbasierte App zur Vorhersage von Überlebenswahrscheinlichkeiten.
+Das Titanic-Orakel ist eine algorithmusbasierte App zur Vorhersage von Überlebenswahrscheinlichkeiten.
 
 ## Lizenz
 
